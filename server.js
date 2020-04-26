@@ -1,8 +1,10 @@
 var express = require('express');
-const port = 5000;
 var app = express();
 const path = require('path');
 
+//http requests
+var $ = require('jquery');
+var http = require('http');
 
 //Loads the handlebars module
 const handlebars = require('express-handlebars');
@@ -19,6 +21,10 @@ app.engine('handlebars', handlebars({
 const routes = require('./routes');
 app.use('/', routes);
 
+//use this folder for static files
+app.use('/static/', express.static(__dirname + '/static/'));
+
+const port = 5000;
 app.listen(port, () => 
     console.log(`App listening to port ${port}`
 ));

@@ -1,15 +1,107 @@
+
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="utf-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Best Website</title>
-  <meta name="HandheldFriendly" content="True" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <!-- <link rel="stylesheet" href="/css/main.min.css"> -->
+  <link rel='icon' href='https://cdn4.iconfinder.com/data/icons/48-bubbles/48/06.Tags-512.png' type='image/x-icon' />
+  <title>{{ pageTitle }}</title>
+
+  <!-- fa icons -->
+  <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+
+  <!-- bootstrap -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <!-- 
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+  -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+
+  <!-- scripts -->
+  <script type="text/javascript" src="/static/assets/js/global.js"></script>
+
 </head>
+
+<!--Navbar -->
+<nav class="navbar navbar-inverse fixed-top navbar-dark bg-dark navbar-expand-sm">
+    <a id='navbarBrand' href='/' class="navbar-brand"><strong>martinbarker</strong></a> 
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown"
+        aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavDropdown">
+        <ul class="navbar-nav">
+            <li class="nav-item ">
+                <a class="nav-link " href="/">Home <span class="sr-only">(current)</span></a>
+            </li>
+
+            <!-- Music Projects Dropdown -->
+            <li class="nav-item dropdown active">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown"
+                    aria-haspopup="true" aria-expanded="false">
+                    YouTube Music Resources
+                </a>
+                <div class="dropdown-menu " aria-labelledby="navbarDropdownMenuLink">
+                    <a class="dropdown-item" target="_blank" href="/tagger">tagger.site</a>
+                    <a class="dropdown-item" target="_blank" href="/discogstagger">discogstagger.site</a>
+                    <a class="dropdown-item" target="_blank" href="https://github.com/MartinBarker/commandLineMusicVideo">commandLineMusicVideo</a>
+                    <a class="dropdown-item" target="_blank" href="https://github.com/MartinBarker/vinyl2digital">vinyl2digital</a>
+                </div>
+            </li>
+
+            <li class="nav-item ">
+                <a class="nav-link " href="/projects">Projects <span class="sr-only">(current)</span></a>
+            </li>
+
+            <!-- Projects Dropdown 
+            <li class="nav-item dropdown active">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown"
+                    aria-haspopup="true" aria-expanded="false">
+                    Projects
+                </a>
+                <div class="dropdown-menu " aria-labelledby="navbarDropdownMenuLink">
+                    <a class="dropdown-item" target="_blank" href="/projects">All Projects</a>
+                    <a class="dropdown-item" target="_blank" href="/popularify">popularify.biz</a>
+                    <a class="dropdown-item" target="_blank" href="/tagger">tagger.site</a>
+                    <a class="dropdown-item" target="_blank" href="/discogstagger">discogstagger.site</a>
+                    <a class="dropdown-item" target="_blank" href="/songsweeper">songsweeper.site</a>
+                    <a class="dropdown-item" target="_blank" href="https://github.com/MartinBarker/bashAlbumExporter">bash album exporter</a>
+                    <a class="dropdown-item" target="_blank" href="https://kexpplaylist.herokuapp.com/playlist/">KEXP Playlist</a>
+                    <a class="dropdown-item" target="_blank" href="/vlcradio">VLC-Radio</a>
+                    <a class="dropdown-item" target="_blank" href="/vlcplaylistrandomizer">VLC-Playlist-Randomizer</a>
+                </div>
+            </li>
+            -->
+
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown"
+                    aria-haspopup="true" aria-expanded="false">
+                    Contact
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                    <a class="dropdown-item" target="_blank" href="http://github.com/MartinBarker">Github</a>
+                    <a class="dropdown-item" target="_blank"
+                        href="https://www.linkedin.com/in/martinbarker99/">LinkedIn</a>
+                    <a class="dropdown-item" target="_blank" href="mailto:martinbarker99@gmail.com">Email</a>
+                    <a class="dropdown-item" target="_blank" href="http://youtube.com/c/martinradio2">YouTube</a>
+                    <a class="dropdown-item" target="_blank" href="http://www.martinradio.com">Music Blog</a>
+                </div>
+            </li>
+
+        </ul>
+    </div>
+</nav>
+
+
+<!-- page main content -->
 <body>
-    Start of body: <br>
-    {{{body}}}
+{{{body}}}
+
+<!-- bootstrap -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
 </body>
+
 </html>
+
+
