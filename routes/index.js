@@ -3,16 +3,26 @@ var router = express.Router();
 
 //home page
 router.get('/', (req, res) => {
-    res.render('main', {layout : 'index'});
+    res.render('home', {
+        layout : 'index', 
+        pageTitle: 'martinbarker.me', 
+        icon: '/static/assets/img/home.png', 
+        homePage:'active',
+    });
 });
 
 //projects page
 router.get('/projects', (req, res) => {
-    res.render('projects', {layout : 'index'});
+    res.render('projects', {
+        layout : 'index',
+        pageTitle: 'projects',
+        icon: '/static/assets/img/projects.png', 
+        projectsTab:'active'
+    });
 });
 
 //tagger routes
-router.use('/tagger', require('./tagger_api').router);
+router.use('/tagger', require('./taggerRoutes').router);
 
 //discogstagger routes
 //router.use('/discogstagger', require('./discogstagger_api').router);

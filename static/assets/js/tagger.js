@@ -1,22 +1,31 @@
-console.log("TAGGER.JS")
 
 
-async function inputOption1(input){
+$(document).ready(function() {
+    $(window).keydown(function(event){
+      if(event.keyCode == 13) {
+        event.preventDefault();
+        document.getElementById("urlInputButton").click();
+        return false;
+      }
+    });
+  });
+
+async function inputOption1(input) {
     console.log("inputOption1()")
-    //get discogs url from input and parse out release ID
-    //...
+    //parse release id from url
+    var urlArr = input.split('/');
+    var discogsListingType = urlArr[urlArr.length-2];
+    var discogsListingCode = urlArr[urlArr.length-1];
+    console.log("discogsListingType = ", discogsListingType)
+    console.log("discogsListingCode = ", discogsListingCode)
 
     //make request to tagger_api.js for tracklist[]
     //tracklist[] = [ ['trackTitle', 'trackTime'], [], [], ...]
     $.ajax({
-        url: '/url',
+        url: discogsListingType+'/'+discogsListingCode,
         type: 'GET',
         contentType: "application/json",
-        data: {
-            Name: $("#inputName").val(),
-            Url: $("#inputUrl").val()
-        },
-        success: function(data) {
+        success: function (data) {
             console.log('ajax successfull, data = ' + data);
         }
     });
@@ -25,7 +34,6 @@ async function inputOption1(input){
     //let timestamp = await getTimestamp(tracklist)
 
     //for each item in tracklist[], append line to copy/paste text box
-
 }
 
 //discogs api functions
@@ -67,9 +75,10 @@ function makeAjax(dataVar, csrftoken) {
     return new Promise(function (resolve, reject) {
         $.ajax({
             url: '/tagger/discogsURL',
-            data: { 
-                csrfmiddlewaretoken: 'b2MsXtS0SVLNx2GWm55xFnUab9rhY4hw0cVws45rlejd6D6iDjK1I8jc4CEaRX6H', 
-                data: dataVar},
+            data: {
+                csrfmiddlewaretoken: 'b2MsXtS0SVLNx2GWm55xFnUab9rhY4hw0cVws45rlejd6D6iDjK1I8jc4CEaRX6H',
+                data: dataVar
+            },
             headers: { 'ACookieAvailableCrossSite': 'SameSite=None' },
             dataType: 'json',
             success: function (msg) {
