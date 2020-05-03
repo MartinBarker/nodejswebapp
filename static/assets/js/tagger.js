@@ -23,20 +23,39 @@ async function inputOption1(input) {
 }
 
 async function getTaggerData(tracklist){
+    var taggerData = []
+    taggerData['key'] = {help: 'bungis'}
+
     var startTimeSeconds = 0;
     var endTimeSeconds = 0;
     for(var i = 0; i < tracklist.length; i++){
-        console.log("track " + i + " title = ", tracklist[i].duration)
+        console.log("track " + i) //+ " title = ", tracklist[i].duration)
         var trackTimeSeconds = moment.duration(tracklist[i].duration).asMinutes()
-        console.log("trackTimeSeconds = ", trackTimeSeconds)
-        startTimeSeconds = startTimeSeconds + trackTimeSeconds
-        console.log("startTimeSeconds = ", startTimeSeconds)
-        console.log("startTimeMinutes = ", moment().startOf('day').seconds(15457).format('hh:mm:ss'))
+        console.log("track time seconds = ", trackTimeSeconds)
+        var trackTimeMinutes = new Date(trackTimeSeconds * 1000).toISOString().substr(11, 8);
+        console.log("track time minutes = ", trackTimeMinutes)
+
+        console.log("track startTime = ", secondsToTimestamp(startTimeSeconds))
+        endTimeSeconds = endTimeSeconds + trackTimeSeconds
+        console.log("track endTime = ", secondsToTimestamp(endTimeSeconds))
         
-        //var timeAdd = moment.duration(tracklist[i].duration).asMinutes() + moment.duration(tracklist[i].duration).asMinutes()
-    } 
-    var taggerData = []
-    taggerData['key'] = {help: 'bungis'}
+        //add data to object
+        var trackData = {title: tracklist[i].title, startTime: secondsToTimestamp(startTimeSeconds), endTime:secondsToTimestamp(endTimeSeconds}
+        taggerData.push(trackData)
+
+        //end of for loop cleanup
+        startTimeSeconds = startTimeSeconds + trackTimeSeconds
+
+        console.log("\n")
+   } 
+   console.log("end of for loop, taggerData = ", taggerData)
+   resolve(taggerData)
+    
+}
+
+function secondsToTimestamp(input){
+    var temp = new Date(input * 1000).toISOString().substr(11, 8);
+    return temp
 }
 
 async function getTracklistFromDiscogs(discogsListingType, discogsListingCode){
