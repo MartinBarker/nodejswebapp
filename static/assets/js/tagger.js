@@ -1,6 +1,5 @@
-
-
 $(document).ready(function() {
+    //function to make sure hitting 'enter' key submits input box
     $(window).keydown(function(event){
       if(event.keyCode == 13) {
         event.preventDefault();
@@ -16,25 +15,54 @@ async function inputOption1(input) {
     var urlArr = input.split('/');
     var discogsListingType = urlArr[urlArr.length-2];
     var discogsListingCode = urlArr[urlArr.length-1];
-    console.log("discogsListingType = ", discogsListingType)
-    console.log("discogsListingCode = ", discogsListingCode)
-
-    //make request to tagger_api.js for tracklist[]
-    //tracklist[] = [ ['trackTitle', 'trackTime'], [], [], ...]
-    $.ajax({
-        url: discogsListingType+'/'+discogsListingCode,
-        type: 'GET',
-        contentType: "application/json",
-        success: function (data) {
-            console.log('ajax successfull, data = ' + data);
-        }
-    });
-
-    //get timestamped tracklist info
-    //let timestamp = await getTimestamp(tracklist)
-
-    //for each item in tracklist[], append line to copy/paste text box
+    //get tracklist from discogs API
+    let discogsTracklist = await getTracklistFromDiscogs(discogsListingType, discogsListingCode)
+    if(discogsTracklist != 'error'){
+        let taggerData = await getTaggerData(discogsTracklist)
+    }
 }
+
+async function getTaggerData(tracklist){
+    var startTimeSeconds = 0;
+    var endTimeSeconds = 0;
+    for(var i = 0; i < tracklist.length; i++){
+        console.log("track " + i + " title = ", tracklist[i].duration)
+        var trackTimeSeconds = moment.duration(tracklist[i].duration).asMinutes()
+        console.log("trackTimeSeconds = ", trackTimeSeconds)
+        startTimeSeconds = startTimeSeconds + trackTimeSeconds
+        console.log("startTimeSeconds = ", startTimeSeconds)
+        console.log("startTimeMinutes = ", moment().startOf('day').seconds(15457).format('hh:mm:ss'))
+        
+        //var timeAdd = moment.duration(tracklist[i].duration).asMinutes() + moment.duration(tracklist[i].duration).asMinutes()
+    } 
+    var taggerData = []
+    taggerData['key'] = {help: 'bungis'}
+}
+
+async function getTracklistFromDiscogs(discogsListingType, discogsListingCode){
+    return new Promise(function (resolve, reject) {
+        $.ajax({
+            url: "https://api.discogs.com/" + discogsListingType + 's/' + discogsListingCode,
+            type: 'GET',
+            contentType: "application/json", 
+            success: function (data) {
+                console.log('getTracklistFromDiscogs() successfull, data = ');
+                console.log(data.tracklist);
+                resolve(data.tracklist)
+            },
+            error: function (error) { // error callback 
+              console.log('getTracklistFromDiscogs() ajax failed, error = ' + error);
+              resolve("error")
+            }   
+          })
+    }); 
+  }
+
+/*
+
+~~~~~~~~~~~~~~~~~~~~ legacy code below ~~~~~~~~~~~~~~~~~~~~~~~
+
+*/
 
 //discogs api functions
 async function taggerDotSite(input) {
@@ -57,7 +85,6 @@ async function taggerDotSite(input) {
     var successValueJson = JSON.parse(JSON.stringify(successValue));
     var tracklist = successValueJson['tracklist']
     console.log("successValueJson['tracklist'] = ", successValueJson['tracklist'])
-
 
     for (var i = 0; i < tracklist.length; i++) {
         console.log("i = ", i, ". ", tracklist[i])
