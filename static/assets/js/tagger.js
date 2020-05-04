@@ -1,83 +1,205 @@
-$(document).ready(function() {
+$(document).ready(function () {
     //function to make sure hitting 'enter' key submits input box
-    $(window).keydown(function(event){
-      if(event.keyCode == 13) {
-        event.preventDefault();
-        document.getElementById("urlInputButton").click();
-        return false;
-      }
+    $(window).keydown(function (event) {
+        if (event.keyCode == 13) {
+            event.preventDefault();
+            document.getElementById("urlInputButton").click();
+            return false;
+        }
     });
-  });
+
+    //if user selects files
+    $("#file").change(async function (input) {
+        inputOption2(input)
+    });
+
+});
+
+//file functions
+
+async function inputOption2(input) {
+    //get file info
+    var file = input.currentTarget.files[0];
+    var songs = input.currentTarget.files;
+    //get tracklistData
+    let tracklistData = await convertFileInfoToTracklistData(songs)
+    console.log("tracklistData = ", tracklistData)
+    //get taggerData
+    let taggerData = await getTaggerData(tracklistData)
+    console.log("taggerData = ", taggerData)
+}
+
+async function convertFileInfoToTracklistData(songs) {
+    return new Promise(async function (resolve, reject) {
+        try {
+            var tracklistData = []
+            for (i = 0; i < songs.length; i++) {
+                let songLength = await getSongLength(songs[i], i);
+                let songTitle = await getSongTitle(songs[i], i);
+                console.log("i = ", i, ". songTitle = ", songTitle, ". songLength = ", songLength, " (", secondsToTimestamp(songLength), ")")
+                var trackData = { duration: songLength, title: songTitle }
+                tracklistData.push(trackData)
+
+                // var endTimeSeconds = startTimeSeconds + songLength
+
+                //convert seconds to minutes 
+                //startTime = convertSecondsToTimestamp(startTimeSeconds);
+
+                //convert seconds to minutes
+                //endTime = convertSecondsToTimestamp(endTimeSeconds);
+
+                //htmlFinalTracklistView = htmlFinalTracklistView + startTime + " - " + endTime + " " + songTitle + "<br>";
+
+                //var startTimeSeconds = endTimeSeconds
+            }
+            console.log("inputoption2: tracklistData = ", tracklistData)
+            resolve(tracklistData)
+        } catch{
+            resolve('error')
+        }
+    });
+}
 
 async function inputOption1(input) {
     console.log("inputOption1()")
     //parse release id from url
     var urlArr = input.split('/');
-    var discogsListingType = urlArr[urlArr.length-2];
-    var discogsListingCode = urlArr[urlArr.length-1];
-    //get tracklist from discogs API
-    let discogsTracklist = await getTracklistFromDiscogs(discogsListingType, discogsListingCode)
-    if(discogsTracklist != 'error'){
-        let taggerData = await getTaggerData(discogsTracklist)
+    var discogsListingType = urlArr[urlArr.length - 2];
+    var discogsListingCode = urlArr[urlArr.length - 1];
+    //get tracklistData from discogs API
+    let tracklistData = await getTracklistFromDiscogs(discogsListingType, discogsListingCode)
+    //if tracklistData is valid, get taggerData
+    if (tracklistData != 'error') {
+        let taggerData = await getTaggerData(tracklistData)
     }
 }
 
-async function getTaggerData(tracklist){
-    var taggerData = []
-    taggerData['key'] = {help: 'bungis'}
-
-    var startTimeSeconds = 0;
-    var endTimeSeconds = 0;
-    for(var i = 0; i < tracklist.length; i++){
-        console.log("track " + i) //+ " title = ", tracklist[i].duration)
-        var trackTimeSeconds = moment.duration(tracklist[i].duration).asMinutes()
-        console.log("track time seconds = ", trackTimeSeconds)
-        var trackTimeMinutes = new Date(trackTimeSeconds * 1000).toISOString().substr(11, 8);
-        console.log("track time minutes = ", trackTimeMinutes)
-
-        console.log("track startTime = ", secondsToTimestamp(startTimeSeconds))
-        endTimeSeconds = endTimeSeconds + trackTimeSeconds
-        console.log("track endTime = ", secondsToTimestamp(endTimeSeconds))
-        
-        //add data to object
-        var trackData = {title: tracklist[i].title, startTime: secondsToTimestamp(startTimeSeconds), endTime:secondsToTimestamp(endTimeSeconds}
-        taggerData.push(trackData)
-
-        //end of for loop cleanup
-        startTimeSeconds = startTimeSeconds + trackTimeSeconds
-
-        console.log("\n")
-   } 
-   console.log("end of for loop, taggerData = ", taggerData)
-   resolve(taggerData)
-    
+async function isHeadingTrack(track){
+    return new Promise(function (resolve, reject) {
+        for (var key in track) {
+            if (track.hasOwnProperty(key)) {
+                //console.log(key + " -> " + track[key]);
+                //console.log("[", key, "]")
+                if(key.includes("type") && track[key] == 'heading'){
+                    resolve(true)
+                }
+            }
+        }
+        resolve(false)
+    })
 }
 
-function secondsToTimestamp(input){
+/*  getTaggerData(tracklist); receive tracklistData[] and return taggerData[] object with track title / timestamps 
+    input: tracklistData[] object looking like this: [ {duration: 234, title: 'track1'}, {duration: 245, title: 'track2'}, {} ... {duration: 03:03, title: 'track1'}]
+*/
+async function getTaggerData(tracklistData) {
+    return new Promise(async function (resolve, reject) {
+        console.log("getTaggerData(), tracklistData = ", tracklistData)
+        var taggerData = []
+
+
+
+        var testTime1_seconds = 4344
+        console.log("testTime1_seconds = ", testTime1_seconds)
+
+        var testTime1_minutes_method1 = secondsToTimestamp(testTime1_seconds)
+        console.log("testTime1_minutes_method1 = ", testTime1_minutes_method1)
+
+        var testTime1_minutes_method2 = convertSecondsToTimestamp(testTime1_seconds)
+        console.log("testTime1_minutes_method2 = ", testTime1_minutes_method2)
+
+
+        
+
+        var startTimeSeconds = 0;
+        var endTimeSeconds = 0;
+        for (var i = 0; i < tracklistData.length; i++) {
+            console.log("tracklistData[i] = ", tracklistData[i])
+            let isHeadingTrackBool = await isHeadingTrack(tracklistData[i])
+            //if track is not a discogs 'heading' track
+            if(!isHeadingTrackBool){
+                if(tracklistData[i].duration == ""){
+                    console.log("no track time")
+                    taggerData = []
+                    var trackData = { title: "Track durations not availiable on every track for this Discogs URL", startTime: "", endTime: ""}
+                    taggerData.push(trackData)
+                    break
+                }else{
+                    console.log("track " + i + ", title = ", tracklistData[i].title, ", duration = ", tracklistData[i].duration)
+            
+                    if( (tracklistData[i].duration.toString(2)).includes(":") ){
+                        console.log("duration is in MM:SS format")
+                        var trackTimeSeconds = moment.duration(tracklistData[i].duration).asMinutes()
+                        console.log("track time seconds = ", trackTimeSeconds)
+                    }else{
+                        console.log("duration is in raw seconds format")
+                        var trackTimeSeconds = tracklistData[i].duration
+                    }
+        
+                    
+                    var trackTimeMinutes = new Date(trackTimeSeconds * 1000).toISOString().substr(11, 8);
+                    console.log("trackTimeMinutes = ", trackTimeMinutes)
+        
+                    console.log("secondsToTimestamp(startTimeSeconds) = ", secondsToTimestamp(startTimeSeconds))
+        
+                    console.log("endTimeSeconds = endTimeSeconds (", endTimeSeconds, ") + trackTimeSeconds (", trackTimeSeconds, ")")
+                    console.log("parseFloat(endTimeSeconds) = ", parseFloat(endTimeSeconds))
+                    console.log("parseFloat(trackTimeSeconds) = ", parseFloat(trackTimeSeconds))
+                    endTimeSeconds = parseFloat(endTimeSeconds) + parseFloat(trackTimeSeconds)
+        
+                    //endTimeSeconds = endTimeSeconds + trackTimeSeconds
+                    console.log("endTimeSeconds = ", endTimeSeconds)
+                    
+        
+                    console.log("endTimeSeconds = ", secondsToTimestamp(endTimeSeconds))
+        
+                    //add data to object
+                    var trackData = { title: tracklistData[i].title, startTime: secondsToTimestamp(startTimeSeconds), endTime: secondsToTimestamp(endTimeSeconds) }
+                    taggerData.push(trackData)
+        
+                    //end of for loop cleanup
+                    startTimeSeconds = startTimeSeconds + trackTimeSeconds
+        
+                    console.log("\n")
+                }
+                
+            }
+
+        }
+        console.log("end of for loop, taggerData = ", taggerData)
+        resolve(taggerData)
+
+    });
+}
+
+
+
+function secondsToTimestamp(input) {
     var temp = new Date(input * 1000).toISOString().substr(11, 8);
     return temp
 }
 
-async function getTracklistFromDiscogs(discogsListingType, discogsListingCode){
+async function getTracklistFromDiscogs(discogsListingType, discogsListingCode) {
     return new Promise(function (resolve, reject) {
         $.ajax({
             url: "https://api.discogs.com/" + discogsListingType + 's/' + discogsListingCode,
             type: 'GET',
-            contentType: "application/json", 
+            contentType: "application/json",
             success: function (data) {
                 console.log('getTracklistFromDiscogs() successfull, data = ');
                 console.log(data.tracklist);
                 resolve(data.tracklist)
             },
             error: function (error) { // error callback 
-              console.log('getTracklistFromDiscogs() ajax failed, error = ' + error);
-              resolve("error")
-            }   
-          })
-    }); 
-  }
+                console.log('getTracklistFromDiscogs() ajax failed, error = ' + error);
+                resolve("error")
+            }
+        })
+    });
+}
 
 /*
+
 
 ~~~~~~~~~~~~~~~~~~~~ legacy code below ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -158,39 +280,7 @@ function blah() {
     //document.getElementById("tracklist").innerHTML = htmlFinalTracklistView;
 }
 
-//file functions
-$("#file").change(async function (e) {
-    var file = e.currentTarget.files[0];
-    var songs = e.currentTarget.files;
-    var numberOfSongs = songs.length;
-    var htmlFinalTracklistView = "";
 
-    var startTime = "x"
-    var endTime = "z"
-    var startTimeSeconds = 0
-    var endTimeSeconds = 0
-    for (i = 0; i < numberOfSongs; i++) {
-        let songLength = await getSongLength(songs[i], i);
-        let songTitle = await getSongTitle(songs[i], i);
-        console.log("i = ", i, ". songTitle = ", songTitle, ". songLength = ", songLength)
-
-        var endTimeSeconds = startTimeSeconds + songLength
-
-        //convert seconds to minutes 
-        startTime = convertSecondsToTimestamp(startTimeSeconds);
-
-        //convert seconds to minutes
-        endTime = convertSecondsToTimestamp(endTimeSeconds);
-
-        htmlFinalTracklistView = htmlFinalTracklistView + startTime + " - " + endTime + " " + songTitle + "<br>";
-
-        var startTimeSeconds = endTimeSeconds
-    }
-    console.log("htmlFinalTracklistView = ")
-    console.log(htmlFinalTracklistView)
-    document.getElementById("tracklist").innerHTML = htmlFinalTracklistView;
-    console.log("end of #file.change()");
-});
 
 function convertSecondsToTimestamp(seconds) {
     var duration = moment.duration(seconds, "seconds");
